@@ -20,21 +20,12 @@ async def init_db() -> 'asyncpg.pool.Pool':
 
 @app.route('/get/sale/order/line/<order_name>')
 async def order_name(order_name):
-    print(order_name)
-    app.db_pool
     async with app.db_pool.acquire() as conn:
         result = await conn.fetchrow("""SELECT sol.name,sol.product_uom_qty,sol.price_unit
                                               FROM sale_order_line sol LEFT JOIN sale_order so ON sol.order_id=so.id
                                                WHERE so.name=$1 """, order_name)
-
-        print(result)
         result = dict(result)
         print(result)
-        print({'result': {
-            'name': result.get('name'),
-            'product_uom_qty': result.get('product_uom_qty'),
-            'price_unit': float(result.get('price_unit'))
-        }})
         return jsonify({'result': {
             'name': result.get('name'),
             'product_uom_qty': float(result.get('product_uom_qty')),
