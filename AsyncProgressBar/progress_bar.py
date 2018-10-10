@@ -6,7 +6,7 @@ from quart import Quart, request, url_for, jsonify
 
 app = Quart(__name__)
 
-sr = redis.StrictRedis(host='localhost', port=6379)
+sr = redis.StrictRedis(host='localhost', password='yuan', port=6379, db=0)
 sr.execute_command('FLUSHDB')
 
 
@@ -34,7 +34,6 @@ async def check_status():
                 await aredis.set('lastProcessed', str(await aredis.get('processed')))
     except:
         pass
-
     try:
         status['state'] = sr.get('state').decode()
         status['processed'] = sr.get('processed').decode()
@@ -119,7 +118,7 @@ async def index():
 async def start_work():
     global aredis
     loop = asyncio.get_event_loop()
-    aredis = await aioredis.create_redis('redis://localhost', loop=loop)
+    aredis = await aioredis.create_redis('redis://localhost', password='yuan', db=1, loop=loop)
 
     if await aredis.get('state') == b'running':
         return "<center>Please wait for current work to finish.</center>"
@@ -138,5 +137,6 @@ async def start_work():
         return body
 
 
-
+if __name__ == "__main__":
+    app.run('localhost', port=5000, debug=True)
 
