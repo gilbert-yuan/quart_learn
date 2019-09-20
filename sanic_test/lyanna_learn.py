@@ -5,16 +5,20 @@ from wtforms import PasswordField, StringField, SubmitField, TextField, FileFiel
 from wtforms.validators import DataRequired, Length
 from sanic import response, request
 from pathlib import Path
+
 app = Sanic(__name__)
+
 
 class LoginForm(SanicForm):
     name = StringField('Name', validators=[DataRequired])
     password = PasswordField('Passord', validators=[DataRequired])
     submit = SubmitField('Sign In')
 
+
 class FeedbackForm(SanicForm):
     note = TextField('Note', validators=[DataRequired(), Length(max=40)])
     submit = SubmitField('Submit')
+
 
 app.config['WTF_CSRF_SECRET_KEY'] = 'top secret!'
 
@@ -35,7 +39,9 @@ WTF_CSRF_TIME_LIMIT     default 1800
 async def add_session_to_request(request):
     pass
 
+
 app.static('/img', app.config.UPLOAD_DIR)
+
 
 @app.listener('after_server_start')
 async def make_upload_dir(app, loop):
@@ -44,10 +50,10 @@ async def make_upload_dir(app, loop):
 
 session = {}
 
+
 @app.middleware('request')
 async def add_session(request):
     request['session'] = session
-
 
 
 class UploadForm(SanicForm):
@@ -55,7 +61,6 @@ class UploadForm(SanicForm):
         FileRequired(), FileAllowed('bmp gif jpg jpeg png'.split())])
     description = StringField('Description', validators=[Length(max=20)])
     submit = SubmitField('Upload')
-    
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -88,6 +93,7 @@ async def index(request):
     </form>
     """
     return response.html(content)
+
 
 # @app.route('/', methods=['GET', 'POST'])
 # async def index(request):

@@ -2,6 +2,7 @@ from quart import Quart, render_template, websocket, jsonify
 import asyncpg
 import asyncio
 import flask
+
 app = Quart(__name__)
 app.db_pool = None
 DATABASE = {
@@ -12,12 +13,14 @@ DATABASE = {
     'DB_PORT': '5432',
 }
 
+
 async def init_db() -> 'asyncpg.pool.Pool':
     app.db_pool = await asyncpg.create_pool(max_size=50,
-                              user=DATABASE['DB_USER'],
-                              password=DATABASE['DB_USER_PASSWORD'],
-                              database=DATABASE['DB_NAME'],
-                              host=DATABASE['DB_HOST'])
+                                            user=DATABASE['DB_USER'],
+                                            password=DATABASE['DB_USER_PASSWORD'],
+                                            database=DATABASE['DB_NAME'],
+                                            host=DATABASE['DB_HOST'])
+
 
 @app.route('/get/sale/order/line/<order_name>')
 async def order_name(order_name):
@@ -31,6 +34,7 @@ async def order_name(order_name):
             'product_uom_qty': float(result.get('product_uom_qty')),
             'price_unit': float(result.get('price_unit'))
         }})
+
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
